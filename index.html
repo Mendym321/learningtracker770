@@ -241,6 +241,9 @@
       const [editingSession, setEditingSession] = useState(null);
       const [editSessionData, setEditSessionData] = useState(null);
       const [syncing, setSyncing] = useState(false);
+      const [aiInsights, setAiInsights] = useState(null);
+      const [loadingAiInsights, setLoadingAiInsights] = useState(false);
+      const [showAiInsights, setShowAiInsights] = useState(false);
 
       // Auth state listener
       useEffect(() => {
@@ -705,6 +708,229 @@
         return insights;
       };
 
+      const generateAIInsights = async () => {
+        setLoadingAiInsights(true);
+        setShowAiInsights(true);
+
+        try {
+          // Prepare data for analysis
+          const dailyStats = getDailyStats();
+          const weeklyStats = getWeeklyStats();
+          const monthlyStats = getMonthlyStats();
+          
+          const dailyTotal = Object.values(dailyStats).reduce((sum, s) => sum + s.duration, 0);
+          const weeklyTotal = Object.values(weeklyStats).reduce((sum, s) => sum + s.duration, 0);
+          const monthlyTotal = Object.values(monthlyStats).reduce((sum, s) => sum + s.duration, 0);
+
+          // Analyze patterns by day of week
+          const dayOfWeekData = {};
+          const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+          sessions.forEach(s => {
+            const day = s.startTime.getDay();
+            if (!dayOfWeekData[day]) dayOfWeekData[day] = { total: 0, count: 0 };
+            dayOfWeekData[day].total += s.duration;
+            dayOfWeekData[day].count += 1;
+          });
+
+          // Analyze patterns by time of day
+          const hourData = {};
+          sessions.forEach(s => {
+            const hour = s.startTime.getHours();
+            if (!hourData[hour]) hourData[hour] = { total: 0, count: 0 };
+            hourData[hour].total += s.duration;
+            hourData[hour].count += 1;
+          });
+
+          // Find peak day
+          let peakDay = null;
+          let peakDayValue = 0;
+          Object.entries(dayOfWeekData).forEach(([day, data]) => {
+            if (data.total > peakDayValue) {
+              peakDayValue = data.total;
+              peakDay = dayNames[day];
+            }
+          });
+
+          // Find peak hours
+          const peakHours = Object.entries(hourData)
+            .sort((a, b) => b[1].total - a[1].total)
+            .slice(0, 2)
+            .map(([hour]) => {
+              const h = parseInt(hour);
+              return h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h-12} PM`;
+            });
+
+          // Calculate category balance
+          const categoryHours = {};
+          Object.values(weeklyStats).forEach(stat => {
+            categoryHours[stat.title] = (stat.duration / 1000 / 60 / 60).toFixed(1);
+          });
+
+          // Generate comprehensive insights
+          let insights = [];
+
+          // Header
+          insights.push('🎯 PRODUCTIVITY ANALYSIS REPORT\n' + '='.repeat(50) + '\n');
+
+          // 1. Overview
+          insights.push('📊 OVERVIEW');
+          insights.push(`You've tracked ${sessions.length} total sessions across ${buttons.length} categories.`);
+          insights.push(`This week: ${(weeklyTotal / 1000 / 60 / 60).toFixed(1)} hours tracked`);
+          insights.push(`Daily average: ${(weeklyTotal / 7 / 1000 / 60 / 60).toFixed(1)} hours\n`);
+
+          // 2. Productivity Patterns
+          insights.push('⚡ PRODUCTIVITY PATTERNS');
+          if (peakDay) {
+            insights.push(`Your most productive day is ${peakDay} with ${(peakDayValue / 1000 / 60 / 60).toFixed(1)} hours tracked.`);
+          }
+          if (peakHours.length > 0) {
+            insights.push(`Peak productivity hours: ${peakHours.join(' and ')}`);
+          }
+
+          // Session length analysis
+          const avgSessionLength = sessions.reduce((sum, s) => sum + s.duration, 0) / sessions.length;
+          const avgMinutes = Math.round(avgSessionLength / 1000 / 60);
+          insights.push(`Average session length: ${avgMinutes} minutes`);
+          
+          if (avgMinutes < 30) {
+            insights.push('⚠️ Your sessions are quite short. Consider blocking longer focus periods.');
+          } else if (avgMinutes > 120) {
+            insights.push('💡 Long sessions detected! Remember to take breaks every 90-120 minutes.');
+          } else {
+            insights.push('✅ Good session length for maintaining focus!');
+          }
+          insights.push('');
+
+          // 3. Category Balance
+          insights.push('⚖️ CATEGORY BALANCE');
+          const sortedCategories = Object.entries(categoryHours).sort((a, b) => parseFloat(b[1]) - parseFloat(a[1]));
+          sortedCategories.forEach(([category, hours]) => {
+            const percentage = ((parseFloat(hours) / (weeklyTotal / 1000 / 60 / 60)) * 100).toFixed(0);
+            insights.push(`${category}: ${hours} hours (${percentage}%)`);
+          });
+
+          if (sortedCategories.length > 1) {
+            const ratio = parseFloat(sortedCategories[0][1]) / parseFloat(sortedCategories[1][1]);
+            if (ratio > 3) {
+              insights.push(`\n⚠️ Heavy focus on ${sortedCategories[0][0]}. Consider balancing with other categories.`);
+            } else {
+              insights.push('\n✅ Good balance across categories!');
+            }
+          }
+          insights.push('');
+
+          // 4. Streak and Consistency
+          insights.push('🔥 CONSISTENCY & STREAKS');
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          let currentStreak = 0;
+          for (let i = 0; i < 30; i++) {
+            const day = new Date(today);
+            day.setDate(day.getDate() - i);
+            const dayEnd = new Date(day);
+            dayEnd.setHours(23, 59, 59, 999);
+            
+            const hasSessions = sessions.some(s => s.startTime >= day && s.startTime <= dayEnd);
+            if (hasSessions) {
+              currentStreak++;
+            } else if (i > 0) {
+              break;
+            }
+          }
+
+          if (currentStreak > 0) {
+            insights.push(`Current streak: ${currentStreak} day${currentStreak > 1 ? 's' : ''}! 🎉`);
+            if (currentStreak >= 7) {
+              insights.push('🏆 Amazing! You\'ve built a solid tracking habit!');
+            } else if (currentStreak >= 3) {
+              insights.push('💪 Keep it up! You\'re building momentum!');
+            }
+          } else {
+            insights.push('Start a new tracking streak today! Consistency is key.');
+          }
+          insights.push('');
+
+          // 5. Recommendations
+          insights.push('💡 PERSONALIZED RECOMMENDATIONS');
+          
+          const recommendations = [];
+
+          // Time-based recommendations
+          if (peakHours.length > 0) {
+            recommendations.push(`Block ${peakHours[0]} for your most important work - that's when you're naturally most productive.`);
+          }
+
+          // Balance recommendations
+          if (sortedCategories.length > 1) {
+            const topCategory = sortedCategories[0][0];
+            const bottomCategory = sortedCategories[sortedCategories.length - 1][0];
+            if (parseFloat(sortedCategories[0][1]) > parseFloat(sortedCategories[sortedCategories.length - 1][1]) * 4) {
+              recommendations.push(`Consider dedicating more time to ${bottomCategory} - you've only tracked ${sortedCategories[sortedCategories.length - 1][1]} hours this week.`);
+            }
+          }
+
+          // Session length recommendations
+          if (avgMinutes < 25) {
+            recommendations.push('Try the Pomodoro Technique: 25-minute focused sessions with 5-minute breaks.');
+          } else if (avgMinutes > 90) {
+            recommendations.push('Break longer sessions into 90-minute chunks with 15-minute breaks for optimal focus.');
+          }
+
+          // Consistency recommendations
+          if (currentStreak < 3) {
+            recommendations.push('Build a daily tracking habit - even 15 minutes counts! Consistency beats intensity.');
+          }
+
+          // Weekly review recommendation
+          const now = new Date();
+          if (now.getDay() === 0 || now.getDay() === 6) {
+            recommendations.push('Perfect time for a weekly review! Reflect on what worked and plan next week.');
+          }
+
+          recommendations.forEach((rec, idx) => {
+            insights.push(`${idx + 1}. ${rec}`);
+          });
+          insights.push('');
+
+          // 6. Wins
+          insights.push('🎉 WINS TO CELEBRATE');
+          const wins = [];
+
+          if (sessions.length >= 50) {
+            wins.push(`You've logged ${sessions.length} sessions! That's serious commitment to tracking.`);
+          } else if (sessions.length >= 20) {
+            wins.push(`${sessions.length} sessions tracked - you're building great data!`);
+          }
+
+          if (currentStreak >= 3) {
+            wins.push(`${currentStreak}-day tracking streak shows excellent consistency!`);
+          }
+
+          if (weeklyTotal > 0) {
+            const weeklyHours = (weeklyTotal / 1000 / 60 / 60).toFixed(1);
+            wins.push(`${weeklyHours} hours tracked this week - you're staying on top of your time!`);
+          }
+
+          if (avgMinutes >= 45 && avgMinutes <= 90) {
+            wins.push('Your session lengths are in the sweet spot for deep work!');
+          }
+
+          if (wins.length === 0) {
+            wins.push('You\'re taking the first step by tracking your time - that\'s a win!');
+          }
+
+          wins.forEach(win => insights.push(`✨ ${win}`));
+
+          const finalInsights = insights.join('\n');
+          setAiInsights(finalInsights);
+        } catch (error) {
+          console.error('Error generating insights:', error);
+          setAiInsights('Unable to generate insights. Please try again.');
+        } finally {
+          setLoadingAiInsights(false);
+        }
+      };
+
       const renderHome = () => (
         <div className="flex-1 flex flex-col items-center justify-center p-8 gap-8">
           <div className="text-center mb-4">
@@ -842,14 +1068,70 @@
                 <h2 className="text-3xl font-bold" style={{ fontFamily: 'Georgia, serif' }}>
                   Insights
                 </h2>
-                <button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={generateAIInsights}
+                    disabled={loadingAiInsights || sessions.length === 0}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    {loadingAiInsights ? 'Analyzing...' : 'Smart Analysis'}
+                  </button>
+                  <button
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors text-sm"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                </div>
               </div>
+              
+              {/* AI Insights Panel */}
+              {showAiInsights && (
+                <div className="mb-8 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border-2 border-purple-200">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-xl">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-purple-900">Smart Productivity Analysis</h3>
+                        <p className="text-sm text-purple-600">In-depth insights from your tracking data</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowAiInsights(false)}
+                      className="p-1 hover:bg-purple-200 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-purple-700" />
+                    </button>
+                  </div>
+                  
+                  {loadingAiInsights ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="text-center">
+                        <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-purple-200 border-t-purple-600 mb-4"></div>
+                        <p className="text-purple-700 font-medium">Analyzing your productivity patterns...</p>
+                      </div>
+                    </div>
+                  ) : aiInsights ? (
+                    <div className="prose prose-purple max-w-none">
+                      <div className="bg-white rounded-xl p-6 shadow-sm whitespace-pre-wrap text-gray-700 leading-relaxed">
+                        {aiInsights}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-purple-600">
+                      Click "AI Analysis" to get personalized insights about your productivity patterns.
+                    </div>
+                  )}
+                </div>
+              )}
               
               {insights.length > 0 && (
                 <div className="mb-8">
