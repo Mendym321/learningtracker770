@@ -4,6 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Time Tracker - Cloud Sync</title>
+  
+  <!-- PWA Configuration -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4F46E5">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Time Tracker">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="description" content="Cloud-synced time tracking with Torah wisdom">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -1658,6 +1668,21 @@
     }
 
     ReactDOM.render(<TimeTracker />, document.getElementById('root'));
+  </script>
+
+  <!-- Service Worker Registration for PWA -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registered:', registration);
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed:', err);
+          });
+      });
+    }
   </script>
 </body>
 </html>
