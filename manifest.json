@@ -1,0 +1,39 @@
+{
+  "name": "Time Tracker",
+  "short_name": "TimeTracker",
+  "description": "Cloud-synced time tracking with Torah wisdom",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Clock In",
+      "short_name": "Clock In",
+      "description": "Start tracking time",
+      "url": "/?action=clockin"
+    },
+    {
+      "name": "View Insights",
+      "short_name": "Insights",
+      "description": "View your productivity insights",
+      "url": "/?tab=insights"
+    }
+  ]
+}
