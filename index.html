@@ -121,6 +121,83 @@
       </svg>
     );
 
+    // Jewish wisdom quotes about Torah study and focus
+    const torahQuotes = [
+      { text: "Turn it over and over, for everything is in it. Look into it, grow old and worn over it, and do not stir from it, for you can have no better portion than it.", source: "Pirkei Avot 5:22" },
+      { text: "If you have learned much Torah, do not claim credit for yourself, because that is why you were created.", source: "Pirkei Avot 2:8" },
+      { text: "Make your Torah study a fixed practice. Say little and do much.", source: "Pirkei Avot 1:15" },
+      { text: "If I am not for myself, who will be for me? But if I am only for myself, what am I? And if not now, when?", source: "Hillel, Pirkei Avot 1:14" },
+      { text: "It is not your duty to finish the work, but neither are you at liberty to neglect it.", source: "Rabbi Tarfon, Pirkei Avot 2:16" },
+      { text: "The day is short, the work is much, the workers are lazy, the reward is great, and the Master is insistent.", source: "Rabbi Tarfon, Pirkei Avot 2:15" },
+      { text: "An idle person will not learn, nor will an impatient teacher teach. One who engages excessively in business will not become wise.", source: "Hillel, Pirkei Avot 2:5" },
+      { text: "Lessen your engagement in business and occupy yourself with Torah.", source: "Shemaya, Pirkei Avot 1:10" },
+      { text: "Be careful with your studies, for an error in learning is tantamount to willful transgression.", source: "Pirkei Avot 4:13" },
+      { text: "One who interrupts his studies to say 'How beautiful is this tree!' is considered as if he forfeited his life.", source: "Pirkei Avot 3:7" },
+      { text: "Anyone whose fear of sin precedes his wisdom, his wisdom will endure. But anyone whose wisdom precedes his fear of sin, his wisdom will not endure.", source: "Pirkei Avot 3:9" },
+      { text: "Whoever engages in Torah study for its own sake merits many things; not only that, but the entire world is worthwhile for him alone.", source: "Pirkei Avot 6:1" },
+      { text: "The more Torah, the more life. The more study, the more wisdom. The more counsel, the more understanding.", source: "Hillel, Pirkei Avot 2:7" },
+      { text: "Do not separate yourself from the community, and do not be confident in yourself until the day you die.", source: "Hillel, Pirkei Avot 2:4" },
+      { text: "Torah acquired at the price of another occupation will in the end be forgotten and cause sin.", source: "Pirkei Avot 4:10" },
+      { text: "Whoever learns in order to teach will be given the means to study and teach. Whoever learns in order to practice will be given the means to study, teach, observe, and practice.", source: "Pirkei Avot 4:5" },
+      { text: "The world stands on three things: Torah, service, and acts of loving-kindness.", source: "Shimon HaTzaddik, Pirkei Avot 1:2" },
+      { text: "Without Torah there is no proper conduct; without proper conduct there is no Torah.", source: "Pirkei Avot 3:17" },
+      { text: "One who walks along a road while reviewing his studies, and interrupts his study to say 'How beautiful is this tree!' - Scripture regards him as if he were mortally guilty.", source: "Pirkei Avot 3:7" },
+      { text: "If you have learned much Torah, do not congratulate yourself, for it was for this that you were created.", source: "Rabban Yochanan ben Zakkai, Pirkei Avot 2:8" },
+      { text: "Be as careful with a light commandment as with a serious one, for you do not know the reward given for the commandments.", source: "Pirkei Avot 2:1" },
+      { text: "Consider three things and you will not come to sin: Know what is above you - a seeing eye, a hearing ear, and all your deeds are recorded in a book.", source: "Rabbi Yehuda HaNasi, Pirkei Avot 2:1" },
+      { text: "Who is wise? One who learns from every person.", source: "Ben Zoma, Pirkei Avot 4:1" },
+      { text: "Provide yourself with a teacher, acquire for yourself a friend, and judge every person favorably.", source: "Rabbi Yehoshua ben Perachiah, Pirkei Avot 1:6" },
+      { text: "Distance yourself from a bad neighbor, do not befriend an evil person, and do not despair of retribution.", source: "Pirkei Avot 1:7" },
+      { text: "The bashful cannot learn, and the impatient cannot teach.", source: "Hillel, Pirkei Avot 2:5" },
+      { text: "One who is occupied with Torah study alone is as if he has no God.", source: "Talmud, Avodah Zarah 17b" },
+      { text: "When two sit together and words of Torah pass between them, the Divine Presence rests between them.", source: "Pirkei Avot 3:2" },
+      { text: "Every assembly that is for the sake of Heaven will endure, but one that is not for the sake of Heaven will not endure.", source: "Pirkei Avot 4:11" },
+      { text: "Silence is a fence for wisdom.", source: "Rabbi Akiva, Pirkei Avot 3:13" },
+      { text: "One hour of repentance and good deeds in this world is better than all of the World to Come.", source: "Pirkei Avot 4:17" },
+      { text: "Jealousy, lust, and honor-seeking drive a person from the world.", source: "Rabbi Elazar HaKappar, Pirkei Avot 4:21" },
+      { text: "Against your will you are born, against your will you live, against your will you die, and against your will you will give an account before the King of Kings.", source: "Pirkei Avot 4:22" },
+      { text: "Make the will of God your will, so that He will make your will His will.", source: "Rabban Gamliel, Pirkei Avot 2:4" },
+      { text: "If there is no Torah, there is no proper conduct; if there is no proper conduct, there is no Torah. If there is no wisdom, there is no fear of God; if there is no fear of God, there is no wisdom.", source: "Rabbi Elazar ben Azariah, Pirkei Avot 3:17" },
+      { text: "One who engages in Torah study at night - a thread of kindness is drawn over him by day.", source: "Talmud, Chagigah 12b" },
+      { text: "The reward for a mitzvah is another mitzvah, and the reward for a transgression is another transgression.", source: "Pirkei Avot 4:2" },
+      { text: "Do not look at the vessel but at what it contains; there may be a new vessel full of old wine, and an old vessel that does not even contain new wine.", source: "Pirkei Avot 4:20" },
+      { text: "Anyone whose deeds exceed his wisdom, his wisdom will endure. But anyone whose wisdom exceeds his deeds, his wisdom will not endure.", source: "Pirkei Avot 3:9" },
+      { text: "Torah protects and rescues a person from all harm in this world and the next.", source: "Talmud, Sotah 21a" },
+      { text: "One who reviews his learning one hundred times is not comparable to one who reviews it one hundred and one times.", source: "Talmud, Chagigah 9b" },
+      { text: "Great is Torah study, for it leads to action.", source: "Talmud, Kiddushin 40b" },
+      { text: "A person's soul will be asked in the World to Come: Did you set aside fixed times for Torah study?", source: "Talmud, Shabbat 31a" },
+      { text: "If you abandon the Torah for one day, it will abandon you for two days.", source: "Jerusalem Talmud, Berachot 9:5" },
+      { text: "Words of Torah do not endure in one who deals with them casually.", source: "Talmud, Eruvin 54a" },
+      { text: "The Holy One, blessed be He, has nothing in His world except the four cubits of Halacha alone.", source: "Talmud, Berachot 8a" },
+      { text: "One who learns Torah and does not review it is like one who plants and does not harvest.", source: "Talmud, Sanhedrin 99a" },
+      { text: "When a person walks along the road without a companion, he should occupy himself with Torah study.", source: "Talmud, Eruvin 54a" },
+      { text: "One who wishes to become wise should occupy himself with matters of money - meaning Torah, which is more precious than gold.", source: "Talmud, Bava Batra 175b" },
+      { text: "There is no room for God in one who is full of himself.", source: "Baal Shem Tov" },
+      { text: "A little bit of light dispels much darkness.", source: "Alter Rebbe, Tanya" },
+      { text: "The essence is the deed.", source: "Pirkei Avot 1:17" },
+      { text: "One who increases Torah study increases life.", source: "Hillel, Pirkei Avot 2:7" },
+      { text: "Be bold as a leopard, light as an eagle, swift as a deer, and strong as a lion to do the will of your Father in Heaven.", source: "Judah ben Tema, Pirkei Avot 5:20" },
+      { text: "The reward for learning Torah is incomparable to all other commandments, because Torah study leads to all of them.", source: "Talmud, Shabbat 127a" },
+      { text: "One should always see oneself as half guilty and half meritorious. If one performs one mitzvah, fortunate is he, for he has tipped the scales toward merit.", source: "Talmud, Kiddushin 40b" },
+      { text: "In a place where there are no leaders, strive to be a leader.", source: "Hillel, Pirkei Avot 2:5" },
+      { text: "Do not judge your fellow until you have stood in his place.", source: "Hillel, Pirkei Avot 2:4" },
+      { text: "Love work, despise lordship, and do not become familiar with the ruling authorities.", source: "Shemaya, Pirkei Avot 1:10" },
+      { text: "A person is obligated to say: When will my deeds reach the level of the deeds of my forefathers Abraham, Isaac, and Jacob?", source: "Talmud, Tana D'vei Eliyahu" },
+      { text: "According to the effort is the reward.", source: "Ben Hei Hei, Pirkei Avot 5:23" },
+      { text: "The Torah was given in fire, and it is compared to fire - just as fire does not ignite on its own in a large amount, so too words of Torah do not endure in one who studies alone.", source: "Talmud, Ta'anit 7a" },
+      { text: "One who walks along reviewing his learning and interrupts to remark 'How beautiful is this field!' - Scripture considers it as if he forfeited his soul.", source: "Pirkei Avot 3:7" },
+      { text: "The study of Torah is greater than the building of the Temple.", source: "Talmud, Megillah 16b" },
+      { text: "One moment of spiritual bliss in the World to Come is worth more than all of life in this world.", source: "Pirkei Avot 4:17" },
+      { text: "Rabbi Chanina says: I have learned much from my teachers, more from my colleagues, and the most from my students.", source: "Talmud, Ta'anit 7a" },
+      { text: "The world is judged by the majority of its deeds, and an individual is judged by the majority of his deeds.", source: "Talmud, Kiddushin 40b" },
+      { text: "If you have learned much Torah, you will be given much reward; and know that the reward of the righteous is in the World to Come.", source: "Rabbi Tarfon, Pirkei Avot 2:16" },
+      { text: "Everything is foreseen, yet freedom of choice is granted. The world is judged with goodness, and everything is according to the abundance of one's deeds.", source: "Rabbi Akiva, Pirkei Avot 3:15" }
+    ];
+
+    const getRandomTorahQuote = () => {
+      return torahQuotes[Math.floor(Math.random() * torahQuotes.length)];
+    };
+
     // Auth Component
     function AuthScreen({ onAuthSuccess }) {
       const [isSignUp, setIsSignUp] = useState(false);
@@ -244,6 +321,7 @@
       const [aiInsights, setAiInsights] = useState(null);
       const [loadingAiInsights, setLoadingAiInsights] = useState(false);
       const [showAiInsights, setShowAiInsights] = useState(false);
+      const [torahQuote] = useState(() => getRandomTorahQuote());
 
       // Auth state listener
       useEffect(() => {
@@ -943,6 +1021,21 @@
             {syncing && (
               <p className="text-xs text-blue-500 mt-2">Syncing...</p>
             )}
+          </div>
+
+          {/* Torah Quote */}
+          <div className="w-full max-w-2xl mb-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-indigo-600 rounded-lg p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl">📖</div>
+              <div className="flex-1">
+                <p className="text-gray-800 italic font-medium mb-3 leading-relaxed">
+                  "{torahQuote.text}"
+                </p>
+                <p className="text-sm text-indigo-800 font-semibold">
+                  — {torahQuote.source}
+                </p>
+              </div>
+            </div>
           </div>
           
           <div className="flex flex-col gap-4 w-full max-w-md">
