@@ -1046,6 +1046,63 @@
         </div>
       );
 
+      const getWeekStart = (date) => {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day;
+        return new Date(d.setDate(diff));
+      };
+
+      const getPreviousWeekStart = (weekStart) => {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() - 7);
+        return d;
+      };
+
+      const getCurrentWeekTotal = () => {
+        const now = new Date();
+        const weekStart = getWeekStart(now);
+        
+        return sessions
+          .filter(s => {
+            const entryDate = new Date(s.startTime);
+            return entryDate >= weekStart;
+          })
+          .reduce((total, s) => total + (s.duration / 1000 / 60), 0);
+      };
+
+      const getPreviousWeekTotal = () => {
+        const now = new Date();
+        const weekStart = getWeekStart(now);
+        const prevWeekStart = getPreviousWeekStart(weekStart);
+        
+        return sessions
+          .filter(s => {
+            const entryDate = new Date(s.startTime);
+            return entryDate >= prevWeekStart && entryDate < weekStart;
+          })
+          .reduce((total, s) => total + (s.duration / 1000 / 60), 0);
+      };
+
+      const getWeeklyChange = () => {
+        const current = getCurrentWeekTotal();
+        const previous = getPreviousWeekTotal();
+        
+        if (previous === 0) return { percent: 0, increased: true };
+        
+        const change = ((current - previous) / previous) * 100;
+        return { 
+          percent: Math.abs(change).toFixed(1), 
+          increased: change >= 0 
+        };
+      };
+
+      const formatDurationMinutes = (minutes) => {
+        const hours = Math.floor(minutes / 60);
+        const mins = Math.floor(minutes % 60);
+        return `${hours}h ${mins}m`;
+      };
+
       const renderInsights = () => {
         const dailyStats = getDailyStats();
         const weeklyStats = getWeeklyStats();
@@ -1130,6 +1187,50 @@
                       Click "AI Analysis" to get personalized insights about your productivity patterns.
                     </div>
                   )}
+                </div>
+              )}
+              
+              {/* Weekly Trend Section */}
+              {sessions.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-6">Weekly Trend</h3>
+                  <div className="flex items-center justify-center gap-8">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-600 mb-2">Previous Week</div>
+                      <div className="text-3xl font-bold text-gray-400">
+                        {formatDurationMinutes(getPreviousWeekTotal())}
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      {getWeeklyChange().increased ? (
+                        <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <polyline points="17 6 23 6 23 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      ) : (
+                        <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <polyline points="23 18 13.5 8.5 8.5 13.5 1 6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <polyline points="17 18 23 18 23 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                      <span className={`text-2xl font-bold ml-2 ${getWeeklyChange().increased ? 'text-green-500' : 'text-red-500'}`}>
+                        {getWeeklyChange().percent}%
+                      </span>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm text-gray-600 mb-2">This Week</div>
+                      <div className="text-3xl font-bold text-indigo-600">
+                        {formatDurationMinutes(getCurrentWeekTotal())}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center mt-6">
+                    <div className={`inline-block px-4 py-2 rounded-full text-sm font-semibold ${
+                      getWeeklyChange().increased ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {getWeeklyChange().increased ? '📈 Work hours are up!' : '📉 Work hours are down'}
+                    </div>
+                  </div>
                 </div>
               )}
               
